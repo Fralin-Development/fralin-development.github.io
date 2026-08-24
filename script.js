@@ -451,9 +451,11 @@ function applyEmbedParameters() {
         document.body.classList.add("is-embedded");
     }
 
-    if (params.get("theme") === "light") {
-        document.body.classList.add("theme-light");
-    } else if (params.get("bg") === "transparent" || params.get("transparent") === "true" || params.get("transparent") === "1") {
+    if (params.get("theme") === "dark") {
+        document.body.classList.add("theme-dark");
+    }
+    
+    if (params.get("bg") === "transparent" || params.get("transparent") === "true" || params.get("transparent") === "1") {
         document.body.classList.add("theme-transparent");
     }
 

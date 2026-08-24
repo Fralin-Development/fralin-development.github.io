@@ -1,13 +1,12 @@
 :root {
-    --bg-color: #070a12;
-    --card-bg: rgba(255, 255, 255, 0.03);
-    --card-border: rgba(255, 255, 255, 0.07);
-    --gold-primary: #e5c158;
-    --gold-secondary: #c59b27;
-    --text-primary: #ffffff;
-    --text-secondary: #c3cad7;
-    --text-muted: #8b95a5;
-    --font-heading: 'Poppins', sans-serif;
+    --bg-color: #ffffff;
+    --card-bg: rgba(18, 124, 194, 0.03);
+    --card-border: rgba(18, 124, 194, 0.1);
+    --primary-color: #127CC2;
+    --text-primary: #127CC2;
+    --text-secondary: #127CC2;
+    --text-muted: rgba(18, 124, 194, 0.75);
+    --font-heading: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-body: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --scroll-duration: 35s;
     --fade-edge-height: 15vh;
@@ -40,7 +39,7 @@ body {
     height: 60vw;
     max-width: 800px;
     max-height: 800px;
-    background: radial-gradient(circle, rgba(229, 193, 88, 0.08) 0%, rgba(7, 10, 18, 0) 70%);
+    background: radial-gradient(circle, rgba(18, 124, 194, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -53,15 +52,16 @@ body {
     position: fixed;
     top: 20px;
     right: 24px;
-    background: rgba(15, 23, 42, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(18, 124, 194, 0.2);
+    box-shadow: 0 4px 12px rgba(18, 124, 194, 0.08);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     padding: 6px 14px;
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: 500;
-    color: var(--text-secondary);
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -78,7 +78,7 @@ body {
     height: 8px;
     border-radius: 50%;
     background-color: #10b981;
-    box-shadow: 0 0 8px #10b981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
     animation: pulse 2s infinite;
 }
 
@@ -93,18 +93,18 @@ body {
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(30, 20, 10, 0.92);
-    border: 1px solid rgba(245, 158, 11, 0.4);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(245, 158, 11, 0.6);
     backdrop-filter: blur(10px);
     padding: 14px 22px;
     border-radius: 12px;
-    color: #fde68a;
+    color: #92400e;
     font-size: 0.9rem;
     z-index: 200;
     max-width: 90vw;
     width: 580px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
 }
 
@@ -116,11 +116,12 @@ body {
     font-weight: 700;
     margin-bottom: 4px;
     font-size: 0.95rem;
+    color: #b45309;
 }
 
 .error-message {
     font-size: 0.85rem;
-    color: #f3f4f6;
+    color: #4b5563;
     line-height: 1.4;
 }
 
@@ -174,13 +175,9 @@ body {
     font-family: var(--font-heading);
     font-size: clamp(2rem, 4vw, 3rem);
     font-weight: 700;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    color: var(--gold-primary);
-    background: linear-gradient(135deg, #fff2cc 0%, #e5c158 50%, #b8860b 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 4px 20px rgba(229, 193, 88, 0.15);
+    color: var(--primary-color);
     margin-bottom: 12px;
 }
 
@@ -190,6 +187,7 @@ body {
     color: var(--text-secondary);
     letter-spacing: 1px;
     margin-bottom: 20px;
+    opacity: 0.85;
 }
 
 .donor-subheader:empty {
@@ -198,9 +196,10 @@ body {
 
 .header-divider {
     width: 80px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
     margin: 0 auto;
+    border-radius: 2px;
 }
 
 /* Donor List */
@@ -227,15 +226,15 @@ body {
 .donor-name {
     font-size: clamp(1.4rem, 2.8vw, 2rem);
     font-weight: 600;
-    letter-spacing: 1.2px;
+    letter-spacing: 0.5px;
     color: var(--text-primary);
     line-height: 1.3;
 }
 
 .donor-amount {
     font-size: clamp(1rem, 2vw, 1.25rem);
-    font-weight: 600;
-    color: var(--gold-primary);
+    font-weight: 700;
+    color: var(--primary-color);
     margin-top: 6px;
     letter-spacing: 0.5px;
 }
@@ -245,6 +244,7 @@ body {
     font-style: italic;
     font-weight: 300;
     color: var(--text-secondary);
+    opacity: 0.85;
     margin-top: 6px;
     line-height: 1.4;
     max-width: 85%;
@@ -303,7 +303,7 @@ body {
 }
 
 /* ==========================================================================
-   Canvas LMS & Iframe Embed Customizations
+   Canvas / Iframe / Embed Customizations
    ========================================================================== */
 body.is-embedded {
     height: 100%;
@@ -328,53 +328,48 @@ body.theme-transparent {
     background-color: transparent !important;
 }
 
-body.theme-light {
-    --bg-color: #ffffff;
-    --text-primary: #127CC2;
-    --text-secondary: #127CC2;
-    --text-muted: #127CC2;
-    --gold-primary: #127CC2;
-    background-color: #ffffff;
-    color: #127CC2;
-}
-
-body.theme-light .donor-header {
-    color: #127CC2;
-    background: none;
-    -webkit-background-clip: unset;
-    -webkit-text-fill-color: #127CC2;
-    text-shadow: none;
-    font-weight: 700;
-}
-
-body.theme-light .donor-subheader {
-    color: #127CC2;
-    opacity: 0.8;
-}
-
-body.theme-light .header-divider {
-    background: linear-gradient(90deg, transparent, #127CC2, transparent);
-    opacity: 0.6;
-}
-
-body.theme-light .donor-name {
-    color: #127CC2;
-    font-weight: 600;
-}
-
-body.theme-light .donor-amount {
-    color: #127CC2;
-    font-weight: 700;
-}
-
-body.theme-light .donor-message {
-    color: #127CC2;
-    opacity: 0.8;
-}
-
 body.no-header .header-section {
     display: none;
 }
+
+/* Optional Dark Theme variant via ?theme=dark */
+body.theme-dark {
+    --bg-color: #070a12;
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --card-border: rgba(255, 255, 255, 0.07);
+    --primary-color: #e5c158;
+    --text-primary: #ffffff;
+    --text-secondary: #c3cad7;
+    background-color: #070a12;
+    color: #ffffff;
+}
+
+body.theme-dark .ambient-glow {
+    background: radial-gradient(circle, rgba(229, 193, 88, 0.08) 0%, rgba(7, 10, 18, 0) 70%);
+}
+
+body.theme-dark .donor-header {
+    background: linear-gradient(135deg, #fff2cc 0%, #e5c158 50%, #b8860b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+body.theme-dark .donor-name {
+    color: #ffffff;
+}
+
+body.theme-dark .donor-amount {
+    color: #e5c158;
+}
+
+body.theme-dark .donor-message {
+    color: #c3cad7;
+}
+
+body.theme-dark .header-divider {
+    background: linear-gradient(90deg, transparent, #e5c158, transparent);
+}
+
 
 
 

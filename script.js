@@ -443,6 +443,41 @@ async function fetchDonorData() {
 // INITIALIZATION & EVENT LISTENERS
 // =============================================================================
 
+function applyEmbedParameters() {
+    const params = new URLSearchParams(window.location.search);
+    const isIframe = window.self !== window.top || params.get("embed") === "true" || params.get("embed") === "1";
+
+    if (isIframe) {
+        document.body.classList.add("is-embedded");
+    }
+
+    if (params.get("theme") === "light") {
+        document.body.classList.add("theme-light");
+    } else if (params.get("bg") === "transparent" || params.get("transparent") === "true" || params.get("transparent") === "1") {
+        document.body.classList.add("theme-transparent");
+    }
+
+    if (params.get("header") === "false" || params.get("header") === "0") {
+        document.body.classList.add("no-header");
+    }
+
+    if (params.has("title")) {
+        CONFIG.headerTitle = params.get("title");
+    }
+
+    if (params.has("subtitle")) {
+        CONFIG.subHeaderTitle = params.get("subtitle");
+    }
+
+    if (params.has("speed")) {
+        const customSpeed = parseFloat(params.get("speed"));
+        if (!isNaN(customSpeed) && customSpeed > 0) {
+            CONFIG.scrollSpeedPixelsPerSecond = customSpeed;
+        }
+    }
+}
+
+applyEmbedParameters();
 fetchDonorData();
 
 const pollIntervalMs = Math.max((CONFIG.refreshIntervalSeconds || 30) * 1000, 5000);
@@ -451,6 +486,7 @@ setInterval(fetchDonorData, pollIntervalMs);
 window.addEventListener("resize", () => {
     updateScrollDuration();
 });
+
 
 
 

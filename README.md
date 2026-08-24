@@ -4,23 +4,46 @@ A responsive, dynamically scrolling donor recognition display for the Fralin Mus
 
 ---
 
-## 🎓 Canvas LMS Embed Snippets
+## 🎨 How to Embed in Canva (Presentations, Digital Signage & Websites)
 
-To embed this live donor scroll directly inside a **Canvas Page**, **Announcement**, or **Module**, use the following snippets:
+Canva has a built-in **Embeds** tool that lets you paste any live web link directly into your design.
 
-### 1. Default Dark Museum Theme
+### 1. The Best Links for Canva:
+
+- **Option A: White Background with `#127CC2` Text in Poppins**
+  ```text
+  https://fralin-development.github.io/?theme=light
+  ```
+
+- **Option B: Transparent Background with `#127CC2` Text (Best for placing over Canva graphics/backgrounds!)**
+  ```text
+  https://fralin-development.github.io/?theme=light&bg=transparent
+  ```
+
+- **Option C: Transparent Background + No Title (Use if you already added a title in Canva)**
+  ```text
+  https://fralin-development.github.io/?theme=light&bg=transparent&header=false
+  ```
+
+- **Option D: Dark Gala Museum Theme**
+  ```text
+  https://fralin-development.github.io/?embed=true
+  ```
+
+### 2. Steps to Add into Canva:
+1. Open your design or presentation in [Canva](https://www.canva.com).
+2. On the left-hand toolbar, click **Apps** → search for **Embeds** (or click the **Embeds** icon).
+3. Paste one of the URLs above into the box and click **Add to design**.
+4. Resize and drag the scroll box anywhere on your Canva slide/page!
+
+---
+
+## 🎓 HTML / iframe Embed Codes (For Webpages & LMS)
+
+If you are embedding using raw HTML / `<iframe>`:
+
 ```html
-<iframe 
-    src="https://fralin-development.github.io/?embed=true" 
-    width="100%" 
-    height="600" 
-    style="border: none; border-radius: 12px; max-width: 900px; display: block; margin: 0 auto;" 
-    allowfullscreen>
-</iframe>
-```
-
-### 2. Clean Light Theme (Matches Canvas White Background)
-```html
+<!-- Clean Light Theme (Poppins + #127CC2) -->
 <iframe 
     src="https://fralin-development.github.io/?embed=true&theme=light" 
     width="100%" 
@@ -30,35 +53,17 @@ To embed this live donor scroll directly inside a **Canvas Page**, **Announcemen
 </iframe>
 ```
 
-### 3. Transparent Minimal (No Title / Transparent Background)
-```html
-<iframe 
-    src="https://fralin-development.github.io/?embed=true&bg=transparent&header=false" 
-    width="100%" 
-    height="500" 
-    style="border: none; width: 100%;" 
-    allowfullscreen>
-</iframe>
-```
-
-### 4. Adding as a Canvas Module Item
-1. In Canvas, navigate to **Modules** → click **`+` (Add Item)**.
-2. Select **External URL** from the dropdown.
-3. Enter URL: `https://fralin-development.github.io/?embed=true`
-4. Enter Page Name: `Fralin Donor Roll`
-5. Click **Add Item**.
-
 ---
 
 ## ⚙️ URL Customization Parameters
 
 | Parameter | Example | Description |
 | :--- | :--- | :--- |
-| `embed=true` | `?embed=true` | Optimizes viewport and hides status badges for iframe embeds |
-| `theme=light` | `?theme=light` | Swatch to light theme (white background, dark typography) |
-| `bg=transparent` | `?bg=transparent` | Removes background color to blend with container |
-| `header=false` | `?header=false` | Hides the top "Special Thanks" header |
+| `theme=light` | `?theme=light` | White background with `#127CC2` Poppins text |
+| `bg=transparent` | `?bg=transparent` | Removes background color so Canva slide background shows through |
+| `header=false` | `?header=false` | Hides the top "Special Thanks to Our Donors" header |
 | `speed=35` | `?speed=35` | Sets scroll speed in pixels/second (default: 45) |
 | `title=...` | `?title=Honor%20Roll` | Dynamically overrides the main header title |
 | `subtitle=...` | `?subtitle=2026` | Adds or overrides a subtitle |
+
 

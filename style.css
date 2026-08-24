@@ -302,3 +302,49 @@ body {
     }
 }
 
+/* ==========================================================================
+   Canvas LMS & Iframe Embed Customizations
+   ========================================================================== */
+body.is-embedded {
+    height: 100%;
+    width: 100%;
+    min-height: 100%;
+}
+
+body.is-embedded .scroll-container {
+    height: 100%;
+    width: 95%;
+}
+
+body.is-embedded .ambient-glow {
+    display: none;
+}
+
+body.is-embedded .status-badge {
+    display: none !important;
+}
+
+body.theme-transparent {
+    background-color: transparent !important;
+}
+
+body.theme-light {
+    --bg-color: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #64748b;
+    --gold-primary: #92400e;
+    background-color: #ffffff;
+}
+
+body.theme-light .donor-header {
+    background: linear-gradient(135deg, #b45309 0%, #d97706 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+body.no-header .header-section {
+    display: none;
+}
+
+

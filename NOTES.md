@@ -25,20 +25,24 @@
 
 - [x] **Commit Pending Files**: `_config.yml` committed and tracked on `dev_steph_soph`.
 - [x] **Update `script.js`**:
-  - [x] Implemented auto-parser `getGoogleSheetCsvUrl()` to handle any Google Sheets link (share link, view link, or tab link with `#gid=...` or `?gid=...`).
+  - [x] Implemented auto-parser `getGoogleSheetCsvUrl()` for Google Sheets and `getSharePointDownloadUrl()` for SharePoint / Excel Online.
+  - [x] Added SheetJS (`xlsx.full.min.js`) support to read `.xlsx` workbooks and target specific tabs (e.g. `Donation Screen`).
   - [x] Implemented direct, keyless CSV fetching and robust RFC 4180 parsing (`parseCSV()`).
   - [x] Added smart column detection for Donor Name, Amount, and Custom Dedication/Message.
+  - [x] Added local fallback (`donors.csv`) for resilience against external CORS or network restrictions.
   - [x] Configured auto-polling with cache-busting timestamp (`_t=...`) to reflect live updates automatically.
   - [x] Implemented dynamic animation duration calculation based on content height and configurable scroll speed.
-  - [x] Added sample fallback donor roll and user-friendly error banners if permissions are restricted.
+  - [x] Added sample fallback donor roll and user-friendly status banners.
 - [x] **Customize Scrolling & Visuals (`style.css` & `index.html`)**:
   - [x] Designed elegant museum/kiosk aesthetic with ambient radial lighting and gold accents.
   - [x] Configured smooth top & bottom edge masking (`mask-image: linear-gradient`).
   - [x] Added pause-on-hover capability and responsive sizing for mobile, 1080p, and 4K displays.
   - [x] Added status indicator badge for live sync verification.
-- [ ] **Provide Google Sheet Link / Tab**:
-  - Paste your Google Sheet URL into `CONFIG.sheetUrl` in `script.js` (or share it in chat so it can be added).
-  - Ensure the sheet's Share permissions are set to **"Anyone with the link can view"**.
-- [ ] **Test End-to-End**:
-  - Add or modify rows in the Google Sheet and verify live updates in browser.
+- [x] **Configure Data Source**:
+  - [x] Linked the SharePoint guest URL for `2026 Fralin Acknowledgements.xlsx`.
+  - [x] Targeted the `Donation Screen` tab (31 donors).
+  - [x] Generated `donors.csv` in the repository for offline / instant loading.
+- [x] **Test End-to-End**:
+  - [x] Verified parser and rendering of the 31 donors from `Donation Screen`.
+
 

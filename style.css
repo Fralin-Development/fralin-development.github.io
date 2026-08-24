@@ -149,9 +149,6 @@ body {
     );
 }
 
-.scroll-container:hover .scroll-content {
-    animation-play-state: paused;
-}
 
 .scroll-content {
     position: absolute;

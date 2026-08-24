@@ -7,8 +7,8 @@
     --text-primary: #ffffff;
     --text-secondary: #c3cad7;
     --text-muted: #8b95a5;
-    --font-heading: 'Cinzel', Georgia, 'Times New Roman', serif;
-    --font-body: 'Plus Jakarta Sans', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-heading: 'Poppins', sans-serif;
+    --font-body: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --scroll-duration: 35s;
     --fade-edge-height: 15vh;
 }
@@ -330,21 +330,51 @@ body.theme-transparent {
 
 body.theme-light {
     --bg-color: #ffffff;
-    --text-primary: #0f172a;
-    --text-secondary: #334155;
-    --text-muted: #64748b;
-    --gold-primary: #92400e;
+    --text-primary: #127CC2;
+    --text-secondary: #127CC2;
+    --text-muted: #127CC2;
+    --gold-primary: #127CC2;
     background-color: #ffffff;
+    color: #127CC2;
 }
 
 body.theme-light .donor-header {
-    background: linear-gradient(135deg, #b45309 0%, #d97706 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #127CC2;
+    background: none;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: #127CC2;
+    text-shadow: none;
+    font-weight: 700;
+}
+
+body.theme-light .donor-subheader {
+    color: #127CC2;
+    opacity: 0.8;
+}
+
+body.theme-light .header-divider {
+    background: linear-gradient(90deg, transparent, #127CC2, transparent);
+    opacity: 0.6;
+}
+
+body.theme-light .donor-name {
+    color: #127CC2;
+    font-weight: 600;
+}
+
+body.theme-light .donor-amount {
+    color: #127CC2;
+    font-weight: 700;
+}
+
+body.theme-light .donor-message {
+    color: #127CC2;
+    opacity: 0.8;
 }
 
 body.no-header .header-section {
     display: none;
 }
+
 
 

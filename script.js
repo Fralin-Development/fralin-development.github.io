@@ -21,7 +21,7 @@ const CONFIG = {
     fallbackCsvUrl: "./donors.csv",
 
     // 4. Titles displayed at the top of the scrolling list
-    headerTitle: "Special Thanks to Our Donors",
+    headerTitle: "Thank you to our generous donors who make <em>art together</em> possible",
     subHeaderTitle: "", // Optional subtitle (e.g., "Annual Campaign 2026")
 
     // 5. Polling interval: How often (in seconds) to check for updates
@@ -251,7 +251,7 @@ function updateScrollDuration() {
 }
 
 function renderDonors(donors) {
-    if (mainHeaderElement) mainHeaderElement.textContent = CONFIG.headerTitle;
+    if (mainHeaderElement) mainHeaderElement.innerHTML = CONFIG.headerTitle;
     if (subHeaderElement) {
         subHeaderElement.textContent = CONFIG.subHeaderTitle;
         subHeaderElement.style.display = CONFIG.subHeaderTitle ? "block" : "none";

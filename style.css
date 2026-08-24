@@ -173,12 +173,18 @@ body {
 
 .donor-header {
     font-family: var(--font-heading);
-    font-size: clamp(2rem, 4vw, 3rem);
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
     font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+    letter-spacing: 0.5px;
     color: var(--primary-color);
-    margin-bottom: 12px;
+    margin: 0 auto 16px auto;
+    line-height: 1.35;
+    max-width: 860px;
+}
+
+.donor-header em {
+    font-style: italic;
+    font-weight: 700;
 }
 
 .donor-subheader {

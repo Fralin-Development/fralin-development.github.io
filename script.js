@@ -9,7 +9,7 @@
 const CONFIG = {
     // 1. Paste your full Google Sheet URL here (any share link, view link, or tab link with #gid=...)
     // Example: "https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit#gid=0"
-    sheetUrl: "https://myuva-my.sharepoint.com/:x:/r/personal/dbg5af_virginia_edu/_layouts/15/Doc.aspx?sourcedoc=%7BB17AAC43-41DD-40B7-9A69-9C5CD31E8306%7D&file=2026%20Fralin%20Acknowledgements.xlsx&action=default&mobileredirect=true&DefaultItemOpen=1&web=1",
+    sheetUrl: "https://myuva-my.sharepoint.com/:x:/r/personal/dbg5af_virginia_edu/Documents/Fralin%20Development%20Team%20-%20Shared/Fralin%20Acknowledgments/2026%20Fralin%20Acknowledgements.xlsx?d=wb17aac4341dd40b79a699c5cd31e8306&csf=1&web=1&e=dlmhaC",
 
     // 2. Titles displayed at the top of the scrolling list
     headerTitle: "Special Thanks to Our Donors",

@@ -3,17 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Donor Scroll</title>
+    <title>Fralin Development - Live Donor Roll</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="scroll-container">
-        <div class="scroll-content" id="donor-list">
-            <div class="donor-header">Special Thanks to Our Donors</div>
-            <div class="donor-name">Loading donors...</div>
-        </div>
+    <!-- Background Ambient Glow -->
+    <div class="ambient-glow"></div>
+
+    <!-- Status & Error Notifications -->
+    <div id="status-badge" class="status-badge hidden">
+        <span class="pulse-dot"></span>
+        <span id="status-text">Live Sync</span>
     </div>
+
+    <div id="error-banner" class="error-banner hidden">
+        <div class="error-title">⚠️ Google Sheet Access Notice</div>
+        <div id="error-message" class="error-message">Unable to fetch sheet. Make sure sharing is set to <strong>"Anyone with the link can view"</strong>.</div>
+    </div>
+
+    <!-- Scrolling Container -->
+    <main class="scroll-container" id="scroll-container">
+        <div class="scroll-content" id="donor-list">
+            <header class="header-section">
+                <h1 class="donor-header" id="main-header">Special Thanks to Our Donors</h1>
+                <p class="donor-subheader" id="sub-header"></p>
+                <div class="header-divider"></div>
+            </header>
+            
+            <div class="donor-items-container" id="donor-items">
+                <div class="donor-card loading-state">
+                    <div class="donor-name">Loading donors...</div>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <script src="script.js"></script>
 </body>
 </html>
+

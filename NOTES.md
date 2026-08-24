@@ -21,16 +21,24 @@
 
 ---
 
-## 2. To-Do List (When You Return)
+## 2. Implementation Progress & Next Steps
 
-- [ ] **Commit Pending Files**: Commit `_config.yml` to `dev_steph_soph` and push.
-- [ ] **Provide Google Sheet Link / Tab**: Share the public Google Sheet link (or tab URL with `#gid=...`).
-- [ ] **Update `script.js`**:
-  - Add auto-parser for Google Sheets share/tab URLs.
-  - Implement direct CSV fetch + parsing (no API key needed).
-  - Handle column mappings (e.g., Donor Name, Amount, Custom Message).
-  - Configure auto-refresh interval for live donor updates.
-- [ ] **Customize Scrolling & Visuals (`style.css`)**:
-  - Adjust animation speed, font sizes, colors, and layout according to display requirements (e.g., projector, kiosk, or web embed).
+- [x] **Commit Pending Files**: `_config.yml` committed and tracked on `dev_steph_soph`.
+- [x] **Update `script.js`**:
+  - [x] Implemented auto-parser `getGoogleSheetCsvUrl()` to handle any Google Sheets link (share link, view link, or tab link with `#gid=...` or `?gid=...`).
+  - [x] Implemented direct, keyless CSV fetching and robust RFC 4180 parsing (`parseCSV()`).
+  - [x] Added smart column detection for Donor Name, Amount, and Custom Dedication/Message.
+  - [x] Configured auto-polling with cache-busting timestamp (`_t=...`) to reflect live updates automatically.
+  - [x] Implemented dynamic animation duration calculation based on content height and configurable scroll speed.
+  - [x] Added sample fallback donor roll and user-friendly error banners if permissions are restricted.
+- [x] **Customize Scrolling & Visuals (`style.css` & `index.html`)**:
+  - [x] Designed elegant museum/kiosk aesthetic with ambient radial lighting and gold accents.
+  - [x] Configured smooth top & bottom edge masking (`mask-image: linear-gradient`).
+  - [x] Added pause-on-hover capability and responsive sizing for mobile, 1080p, and 4K displays.
+  - [x] Added status indicator badge for live sync verification.
+- [ ] **Provide Google Sheet Link / Tab**:
+  - Paste your Google Sheet URL into `CONFIG.sheetUrl` in `script.js` (or share it in chat so it can be added).
+  - Ensure the sheet's Share permissions are set to **"Anyone with the link can view"**.
 - [ ] **Test End-to-End**:
-  - Add/modify sample rows in the Google Sheet and verify that the scroll updates live without page refreshes.
+  - Add or modify rows in the Google Sheet and verify live updates in browser.
+

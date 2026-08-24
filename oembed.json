@@ -1,0 +1,12 @@
+{
+  "version": "1.0",
+  "type": "rich",
+  "title": "Fralin Development - Live Donor Roll",
+  "author_name": "Fralin Museum of Art",
+  "author_url": "https://fralin-development.github.io",
+  "provider_name": "Fralin Museum of Art",
+  "provider_url": "https://fralin-development.github.io",
+  "width": 800,
+  "height": 600,
+  "html": "<iframe src=\"https://fralin-development.github.io/?embed=true&theme=light\" width=\"100%\" height=\"600\" frameborder=\"0\" allowfullscreen></iframe>"
+}

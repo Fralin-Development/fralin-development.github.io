@@ -10,9 +10,8 @@
 // CONFIGURATION
 // =============================================================================
 const CONFIG = {
-    // 1. Paste your full Google Sheet OR SharePoint Guest URL here
-    // Example (SharePoint): "https://myuva-my.sharepoint.com/:x:/g/personal/dbg5af_virginia_edu/IQBDrHqx3UG3QJppnFzTHoMGATxyrU3UWV3-Irso_3Nirt8?e=wVAlnf"
-    // Example (Google Sheets): "https://docs.google.com/spreadsheets/d/.../edit#gid=0"
+    // 1. Paste your full Google Sheet URL here (any share link, view link, or tab link with #gid=...)
+    // Example: "https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit#gid=0"
     sheetUrl: "https://myuva-my.sharepoint.com/:x:/g/personal/dbg5af_virginia_edu/IQBDrHqx3UG3QJppnFzTHoMGATxyrU3UWV3-Irso_3Nirt8?e=wVAlnf",
 
     // 2. Specific Excel sheet / tab name to read from (e.g., "Donation Screen", "Acks - Edited")

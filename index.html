@@ -1,22 +1,15 @@
 <!DOCTYPE html>
 <!--
 ================================================================================
-🎨 CANVA EMBED LINKS (Canva Presentations, Digital Signage & Websites)
+🏛️ FRALIN MUSEUM OF ART - LIVE DONOR RECOGNITION ROLL
 ================================================================================
-Option 1 (White Background, #127CC2 Poppins Text):
-https://fralin-development.github.io/?theme=light
+Default URL (White Background, #127CC2 Poppins Text):
+https://fralin-development.github.io/
 
-Option 2 (Transparent Background, #127CC2 Poppins Text):
-https://fralin-development.github.io/?theme=light&bg=transparent
-
-Option 3 (Transparent Background + No Header):
-https://fralin-development.github.io/?theme=light&bg=transparent&header=false
-
-Option 4 (Dark Museum Theme):
-https://fralin-development.github.io/?embed=true
-
-How to use in Canva:
-In Canva -> Apps -> Embeds -> Paste one of the URLs above -> "Add to design"
+Custom Display Options:
+- Transparent Background: https://fralin-development.github.io/?bg=transparent
+- Custom Scroll Speed:    https://fralin-development.github.io/?speed=35
+- Dark Gala Theme:        https://fralin-development.github.io/?theme=dark
 ================================================================================
 -->
 <html lang="en">
@@ -35,17 +28,11 @@ In Canva -> Apps -> Embeds -> Paste one of the URLs above -> "Add to design"
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=20260824b">
+    <link rel="stylesheet" href="style.css?v=20260824c">
 </head>
 <body>
     <!-- Background Ambient Glow -->
     <div class="ambient-glow"></div>
-
-    <!-- Status & Error Notifications -->
-    <div id="status-badge" class="status-badge hidden">
-        <span class="pulse-dot"></span>
-        <span id="status-text">Live Sync</span>
-    </div>
 
     <div id="error-banner" class="error-banner hidden">
         <div class="error-title">⚠️ Google Sheet Access Notice</div>
@@ -71,7 +58,7 @@ In Canva -> Apps -> Embeds -> Paste one of the URLs above -> "Add to design"
 
     <!-- SheetJS for Excel (.xlsx) parsing support -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="script.js?v=20260824b"></script>
+    <script src="script.js?v=20260824c"></script>
 </body>
 </html>
 

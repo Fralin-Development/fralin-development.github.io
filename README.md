@@ -1,54 +1,32 @@
 # Fralin Development - Live Donor Roll
 
-A responsive, dynamically scrolling donor recognition display for the Fralin Museum of Art. Supports live data from Google Sheets, SharePoint / Excel Online (`.xlsx`), or local CSV files.
+A responsive, smoothly scrolling live donor recognition display built for the **Fralin Museum of Art**. 
+
+Default styling features **Poppins typography**, **`#127CC2` vibrant blue text**, and a clean **white background**.
 
 ---
 
-## 🎨 How to Embed in Canva (Presentations, Digital Signage & Websites)
+## 🖥️ How to Display the Donor Roll
 
-Canva has a built-in **Embeds** tool that lets you paste any live web link directly into your design.
-
-### 1. The Best Links for Canva:
-
-- **Option A: White Background with `#127CC2` Text in Poppins**
-  ```text
-  https://fralin-development.github.io/?theme=light
-  ```
-
-- **Option B: Transparent Background with `#127CC2` Text (Best for placing over Canva graphics/backgrounds!)**
-  ```text
-  https://fralin-development.github.io/?theme=light&bg=transparent
-  ```
-
-- **Option C: Transparent Background + No Title (Use if you already added a title in Canva)**
-  ```text
-  https://fralin-development.github.io/?theme=light&bg=transparent&header=false
-  ```
-
-- **Option D: Dark Gala Museum Theme**
-  ```text
-  https://fralin-development.github.io/?embed=true
-  ```
-
-### 2. Steps to Add into Canva:
-1. Open your design or presentation in [Canva](https://www.canva.com).
-2. On the left-hand toolbar, click **Apps** → search for **Embeds** (or click the **Embeds** icon).
-3. Paste one of the URLs above into the box and click **Add to design**.
-4. Resize and drag the scroll box anywhere on your Canva slide/page!
+### 1. Fullscreen Kiosk / TV / Event Display (Recommended)
+Open the URL directly in any modern browser (Chrome, Safari, Edge, Firefox):
+```text
+https://fralin-development.github.io/
+```
+* **Enter Fullscreen**: Press `F11` (Windows) or `Cmd + Shift + F` (Mac).
+* **Live Updates**: The page automatically checks for donor list updates every 15 seconds in the background and updates the scrolling roll smoothly without reloading.
 
 ---
 
-## 🎓 HTML / iframe Embed Codes (For Webpages & LMS)
-
-If you are embedding using raw HTML / `<iframe>`:
+### 2. Embed in Websites & Intranets (WordPress, SharePoint, Canvas LMS, etc.)
+Standard website builders and CMS platforms support direct `<iframe>` embedding:
 
 ```html
-<!-- Clean Light Theme (Poppins + #127CC2) -->
 <iframe 
-    src="https://fralin-development.github.io/?embed=true&theme=light" 
+    src="https://fralin-development.github.io/?embed=true" 
     width="100%" 
-    height="600" 
-    style="border: 1px solid #e2e8f0; border-radius: 12px; max-width: 900px; display: block; margin: 0 auto;" 
+    height="650" 
+    style="border: none; border-radius: 12px; max-width: 960px; display: block; margin: 0 auto;" 
     allowfullscreen>
 </iframe>
 ```
@@ -57,13 +35,27 @@ If you are embedding using raw HTML / `<iframe>`:
 
 ## ⚙️ URL Customization Parameters
 
+You can customize the appearance and behavior by adding query parameters to the URL:
+
 | Parameter | Example | Description |
 | :--- | :--- | :--- |
-| `theme=light` | `?theme=light` | White background with `#127CC2` Poppins text |
-| `bg=transparent` | `?bg=transparent` | Removes background color so Canva slide background shows through |
-| `header=false` | `?header=false` | Hides the top "Special Thanks to Our Donors" header |
-| `speed=35` | `?speed=35` | Sets scroll speed in pixels/second (default: 45) |
-| `title=...` | `?title=Honor%20Roll` | Dynamically overrides the main header title |
-| `subtitle=...` | `?subtitle=2026` | Adds or overrides a subtitle |
+| `bg=transparent` | `?bg=transparent` | Makes the background transparent to blend with underlying page backgrounds |
+| `header=false` | `?header=false` | Hides the top banner title |
+| `speed=...` | `?speed=35` | Custom scroll speed in pixels per second (default: `45`) |
+| `title=...` | `?title=Honor%20Roll` | Overrides the main header title |
+| `subtitle=...` | `?subtitle=2026%20Campaign` | Adds or overrides a subtitle |
+| `theme=dark` | `?theme=dark` | Activates the dark museum gala theme (gold text on dark navy) |
 
+**Example Combined URL:**
+```text
+https://fralin-development.github.io/?bg=transparent&speed=35
+```
 
+---
+
+## 🔄 Automated SharePoint Sync
+
+The repository includes an automated GitHub Action workflow (`.github/workflows/sync-donors.yml`):
+* **Automatic Schedule**: Runs every 5 minutes in the background, downloads the latest Excel workbook from the SharePoint guest link, and extracts names from the **`Donation Screen`** tab.
+* **Smart Commits**: If new donors are detected, it updates `donors.csv` and pushes to `main`. If no changes were made, it exits cleanly without creating empty commits.
+* **Manual Instant Sync**: You can also trigger an immediate sync at any time by going to the repository's **Actions** tab → **Auto-Sync Donors from SharePoint** → **Run workflow**.

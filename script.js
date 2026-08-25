@@ -25,9 +25,9 @@ const CONFIG = {
     subHeaderTitle: "", // Optional subtitle (e.g., "Annual Campaign 2026")
 
     // 5. Polling interval: How often (in seconds) to check for updates
-    refreshIntervalSeconds: 30,
+    refreshIntervalSeconds: 15,
 
-    // 6. Scroll speed in pixels per second (e.g., 35 = slow/relaxed, 50 = standard, 70 = brisk)
+    // 6. Scroll speed in pixels per second (e.g., 35 = slow/relaxed, 45 = standard, 70 = brisk)
     scrollSpeedPixelsPerSecond: 45,
 
     // 7. Column mappings: Header names (case-insensitive) or 0-based column indexes
@@ -39,7 +39,7 @@ const CONFIG = {
     },
 
     // 8. Show status indicator in top-right corner
-    showStatusBadge: true
+    showStatusBadge: false
 };
 
 // Fallback sample data displayed when no data source is reachable

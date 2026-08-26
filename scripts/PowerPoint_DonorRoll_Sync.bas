@@ -21,12 +21,12 @@ Public Const CSV_URL As String = "https://fralin-development.github.io/donors.cs
 Public Const HEADER_TITLE As String = "THANK YOU TO OUR GENEROUS DONORS"
 Public Const SUBHEADER_TITLE As String = "Who Make Art Together Possible"
 Public Const FONT_FAMILY As String = "Poppins"
-Public Const SCROLL_DURATION_SECONDS As Single = 45
-Public Const ANIM_REPEAT_COUNT As Long = 10
+Public Const SCROLL_DURATION_SECONDS As Single = 45   ' Time for 1 full scroll pass (seconds)
+Public Const ANIM_REPEAT_COUNT As Long = 1000         ' Infinite / continuous looping
 Public Const TARGET_SLIDE_INDEX As Long = 1
 
 ' ==============================================================================
-' MAIN MACRO: Sync Donors and Generate Native Rolling Credits
+' 1. MAIN MACRO: Sync Donors and Generate Continuous Rolling Credits
 ' ==============================================================================
 Sub SyncDonorsAndCreateRollingList()
     Dim csvContent As String
@@ -43,7 +43,7 @@ Sub SyncDonorsAndCreateRollingList()
 
     On Error GoTo ErrorHandler
 
-    ' 1. Fetch CSV Content from GitHub Pages
+    ' 1. Fetch CSV Content from GitHub Pages (cache-busted with timestamp)
     csvContent = FetchUrlContent(CSV_URL & "?t=" & Format(Now, "yyyymmddhhnnss"))
     If Len(Trim(csvContent)) = 0 Then
         MsgBox "Failed to download donor data from:" & vbCrLf & CSV_URL & vbCrLf & vbCrLf & _
@@ -92,7 +92,7 @@ Sub SyncDonorsAndCreateRollingList()
     End If
     fullText = fullText & String(30, "-") & vbCrLf & vbCrLf
 
-    ' Skip row 0 (Header: Name, Amount, Message)
+    ' Skip row 0 (Header)
     For i = 1 To UBound(donorRows, 1)
         dName = Trim(CStr(donorRows(i, 0)))
         dAmount = Trim(CStr(donorRows(i, 1)))
@@ -126,7 +126,7 @@ Sub SyncDonorsAndCreateRollingList()
     donorBox.TextFrame.MarginBottom = 20
     donorBox.TextFrame.TextRange.Text = fullText
 
-    ' Format Typography & Color (Fralin Blue: #127CC2 -> RGB(18, 124, 194))
+    ' Typography & Fralin Blue (#127CC2)
     With donorBox.TextFrame.TextRange
         .Font.Name = FONT_FAMILY
         .Font.Size = 22
@@ -135,7 +135,7 @@ Sub SyncDonorsAndCreateRollingList()
         .ParagraphFormat.Alignment = ppAlignCenter
     End With
 
-    ' Make Title larger and bold
+    ' Large bold title
     On Error Resume Next
     With donorBox.TextFrame.TextRange.Paragraphs(1)
         .Font.Bold = msoTrue
@@ -143,8 +143,7 @@ Sub SyncDonorsAndCreateRollingList()
     End With
     On Error GoTo ErrorHandler
 
-    ' 8. Apply Native PowerPoint "Credits" Animation
-    ' Clear existing animations on the slide
+    ' 8. Apply Native PowerPoint "Credits" Animation (Infinite Continuous Loop)
     For i = donorSlide.TimeLine.MainSequence.Count To 1 Step -1
         donorSlide.TimeLine.MainSequence(i).Delete
     Next i
@@ -158,8 +157,8 @@ Sub SyncDonorsAndCreateRollingList()
     animEffect.Timing.RepeatCount = ANIM_REPEAT_COUNT
 
     MsgBox "Success! Loaded " & (UBound(donorRows, 1)) & " donors onto Slide " & TARGET_SLIDE_INDEX & "." & vbCrLf & vbCrLf & _
-           "Press F5 (or Shift + F5) to start the presentation and watch the rolling credits.", _
-           vbInformation, "Donor Roll Updated"
+           "The animation will loop continuously." & vbCrLf & _
+           "Press F5 (or Shift + F5) to start the presentation!", vbInformation, "Donor Roll Updated"
     Exit Sub
 
 ErrorHandler:
@@ -168,7 +167,7 @@ ErrorHandler:
 End Sub
 
 ' ==============================================================================
-' DARK THEME VARIANT: Navy & Gold gala theme
+' 2. DARK THEME GALA VARIANT
 ' ==============================================================================
 Sub SyncDonorsDarkMode()
     SyncDonorsAndCreateRollingList
@@ -187,19 +186,17 @@ Sub SyncDonorsDarkMode()
     Next i
     
     If Not donorBox Is Nothing Then
-        ' Dark background on slide
         donorSlide.FollowMasterBackground = msoFalse
         donorSlide.Background.Fill.Solid
         donorSlide.Background.Fill.ForeColor.RGB = RGB(7, 10, 18)
         
-        ' Gold Text (#E5C158 -> RGB(229, 193, 88))
         donorBox.TextFrame.TextRange.Font.Color.RGB = RGB(255, 255, 255)
         donorBox.TextFrame.TextRange.Paragraphs(1).Font.Color.RGB = RGB(229, 193, 88)
     End If
 End Sub
 
 ' ==============================================================================
-' HTTP HELPER: Cross-platform HTTP GET (Windows & Mac)
+' 3. HTTP HELPER: Cross-platform HTTP GET (Windows & Mac)
 ' ==============================================================================
 Private Function FetchUrlContent(ByVal url As String) As String
     Dim http As Object
@@ -237,7 +234,7 @@ Private Function FetchUrlContent(ByVal url As String) As String
 End Function
 
 ' ==============================================================================
-' CSV PARSER: Handles standard CSV, multi-line values, and quotes
+' 4. CSV PARSER
 ' ==============================================================================
 Private Function ParseCsvString(ByVal csvRaw As String) As Variant
     Dim lines() As String

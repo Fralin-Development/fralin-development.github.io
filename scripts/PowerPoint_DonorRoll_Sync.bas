@@ -21,7 +21,7 @@ Public Const CSV_URL As String = "https://fralin-development.github.io/donors.cs
 Public Const HEADER_TITLE As String = "THANK YOU TO OUR GENEROUS DONORS"
 Public Const SUBHEADER_TITLE As String = "Who Make Art Together Possible"
 Public Const FONT_FAMILY As String = "Poppins"
-Public Const SCROLL_DURATION_SECONDS As Single = 45#
+Public Const SCROLL_DURATION_SECONDS As Single = 45
 Public Const ANIM_REPEAT_COUNT As Long = 10
 Public Const TARGET_SLIDE_INDEX As Long = 1
 
@@ -30,7 +30,7 @@ Public Const TARGET_SLIDE_INDEX As Long = 1
 ' ==============================================================================
 Sub SyncDonorsAndCreateRollingList()
     Dim csvContent As String
-    Dim donorRows() As Variant
+    Dim donorRows As Variant        ' Plain Variant (must NOT be declared as dynamic array donorRows() to avoid Type Mismatch)
     Dim donorSlide As Slide
     Dim donorBox As Shape
     Dim animEffect As Effect
@@ -38,19 +38,28 @@ Sub SyncDonorsAndCreateRollingList()
     Dim slideW As Single, slideH As Single
     Dim boxW As Single, boxH As Single
     Dim fullText As String
+    Dim dCount As Long
     
     On Error GoTo ErrorHandler
 
     ' 1. Fetch CSV Content from GitHub Pages
     csvContent = FetchUrlContent(CSV_URL & "?t=" & Format(Now, "yyyymmddhhnnss"))
     If Len(Trim(csvContent)) = 0 Then
-        MsgBox "Failed to download donor data from:" & vbCrLf & CSV_URL, vbCritical, "Donor Sync Error"
+        MsgBox "Failed to download donor data from:" & vbCrLf & CSV_URL & vbCrLf & vbCrLf & _
+               "Please check your internet connection.", vbCritical, "Donor Sync Error"
         Exit Sub
     End If
 
-    ' 2. Parse CSV
+    ' 2. Parse CSV into 2D Array
     donorRows = ParseCsvString(csvContent)
-    If (UBound(donorRows, 1) - LBound(donorRows, 1)) < 1 Then
+    
+    If Not IsArray(donorRows) Then
+        MsgBox "Failed to parse donor CSV.", vbCritical, "Parser Error"
+        Exit Sub
+    End If
+    
+    dCount = UBound(donorRows, 1) - LBound(donorRows, 1) + 1
+    If dCount <= 1 Then
         MsgBox "The downloaded donor file contains no donor records.", vbExclamation, "No Donors Found"
         Exit Sub
     End If
@@ -75,13 +84,14 @@ Sub SyncDonorsAndCreateRollingList()
     boxW = slideW * 0.85
     boxH = slideH * 0.85
 
-    ' 6. Build Text Block
+    ' 6. Build Formatted Text Block
     fullText = HEADER_TITLE & vbCrLf
     If Len(Trim(SUBHEADER_TITLE)) > 0 Then
         fullText = fullText & SUBHEADER_TITLE & vbCrLf
     End If
     fullText = fullText & String(30, "-") & vbCrLf & vbCrLf
 
+    ' Skip row 0 (Header: Name, Amount, Message)
     For i = 1 To UBound(donorRows, 1)
         Dim dName As String, dAmount As String, dMsg As String
         dName = Trim(CStr(donorRows(i, 0)))
@@ -126,10 +136,12 @@ Sub SyncDonorsAndCreateRollingList()
     End With
 
     ' Make Title larger and bold
+    On Error Resume Next
     With donorBox.TextFrame.TextRange.Paragraphs(1)
         .Font.Bold = msoTrue
         .Font.Size = 28
     End With
+    On Error GoTo ErrorHandler
 
     ' 8. Apply Native PowerPoint "Credits" Animation
     ' Clear existing animations on the slide
@@ -145,13 +157,14 @@ Sub SyncDonorsAndCreateRollingList()
     animEffect.Timing.Duration = SCROLL_DURATION_SECONDS
     animEffect.Timing.RepeatCount = ANIM_REPEAT_COUNT
 
-    MsgBox "Success! Updated " & (UBound(donorRows, 1)) & " donors on Slide " & TARGET_SLIDE_INDEX & "." & vbCrLf & _
-           "Press F5 (or Shift + F5) to start the slideshow and watch the rolling credits.", _
-           vbInformation, "Fralin Donor Roll Updated"
+    MsgBox "Success! Loaded " & (UBound(donorRows, 1)) & " donors onto Slide " & TARGET_SLIDE_INDEX & "." & vbCrLf & vbCrLf & _
+           "Press F5 (or Shift + F5) to start the presentation and watch the rolling credits.", _
+           vbInformation, "Donor Roll Updated"
     Exit Sub
 
 ErrorHandler:
-    MsgBox "An error occurred during sync:" & vbCrLf & Err.Description, vbCritical, "VBA Error " & Err.Number
+    MsgBox "An error occurred during sync:" & vbCrLf & _
+           "Error " & Err.Number & ": " & Err.Description, vbCritical, "VBA Sync Error"
 End Sub
 
 ' ==============================================================================
@@ -175,6 +188,7 @@ Sub SyncDonorsDarkMode()
     
     If Not donorBox Is Nothing Then
         ' Dark background on slide
+        donorSlide.FollowMasterBackground = msoFalse
         donorSlide.Background.Fill.Solid
         donorSlide.Background.Fill.ForeColor.RGB = RGB(7, 10, 18)
         
@@ -231,7 +245,7 @@ Private Function ParseCsvString(ByVal csvRaw As String) As Variant
     Dim lines() As String
     Dim totalLines As Long
     Dim i As Long, j As Long
-    Dim results() As String
+    Dim results() As Variant
     Dim rowCount As Long
     Dim cleanText As String
     
@@ -251,9 +265,17 @@ Private Function ParseCsvString(ByVal csvRaw As String) As Variant
             Set tokens = TokenizeCsvLine(lineStr)
             
             If tokens.Count >= 1 Then
-                results(rowCount, 0) = tokens(1) ' Name
-                If tokens.Count >= 2 Then results(rowCount, 1) = tokens(2) ' Amount
-                If tokens.Count >= 3 Then results(rowCount, 2) = tokens(3) ' Message
+                results(rowCount, 0) = CStr(tokens(1)) ' Name
+                If tokens.Count >= 2 Then
+                    results(rowCount, 1) = CStr(tokens(2)) ' Amount
+                Else
+                    results(rowCount, 1) = ""
+                End If
+                If tokens.Count >= 3 Then
+                    results(rowCount, 2) = CStr(tokens(3)) ' Message
+                Else
+                    results(rowCount, 2) = ""
+                End If
                 rowCount = rowCount + 1
             End If
         End If
@@ -261,7 +283,7 @@ Private Function ParseCsvString(ByVal csvRaw As String) As Variant
     
     ' Resize array to actual non-empty row count
     If rowCount > 0 Then
-        Dim finalResults() As String
+        Dim finalResults() As Variant
         ReDim finalResults(0 To rowCount - 1, 0 To 2)
         For i = 0 To rowCount - 1
             For j = 0 To 2

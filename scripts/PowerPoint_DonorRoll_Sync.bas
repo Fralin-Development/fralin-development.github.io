@@ -3,8 +3,7 @@
 ' ==============================================================================
 ' Description: Fetches live donor data (donors.csv) from GitHub Pages and
 '              generates a native PowerPoint text box with smooth, movie-style
-'              upward rolling "Credits" animation that auto-sizes to fit all
-'              donors and calculates the exact duration for a complete scroll.
+'              upward rolling "Credits" animation.
 '
 ' Usage:
 ' 1. Open PowerPoint and press Alt + F11 (Windows) or Option + F11 (Mac).
@@ -22,7 +21,7 @@ Public Const CSV_URL As String = "https://fralin-development.github.io/donors.cs
 Public Const HEADER_TITLE As String = "THANK YOU TO OUR GENEROUS DONORS"
 Public Const SUBHEADER_TITLE As String = "Who Make Art Together Possible"
 Public Const FONT_FAMILY As String = "Poppins"
-Public Const SCROLL_SPEED_POINTS_PER_SEC As Single = 50  ' 40 = Slow/Pensive, 50 = Standard, 65 = Brisk
+Public Const SCROLL_SPEED_POINTS_PER_SEC As Single = 60  ' Scroll speed in points/sec (60 = smooth & readable)
 Public Const ANIM_REPEAT_COUNT As Long = 1000            ' Infinite / continuous looping
 Public Const TARGET_SLIDE_INDEX As Long = 1
 
@@ -112,17 +111,16 @@ Sub SyncDonorsAndCreateRollingList()
         End If
     Next i
 
-    ' Trailing blank lines buffer: Guarantees a clean 3-4 second blank screen pause
-    ' after the last donor scrolls off before the top title restarts from the bottom.
-    fullText = fullText & vbCrLf & vbCrLf & vbCrLf & vbCrLf & vbCrLf & vbCrLf & vbCrLf & vbCrLf & vbCrLf & vbCrLf
+    ' Trailing empty buffer: gives a clean 3-second blank pause after the last donor
+    fullText = fullText & vbCrLf & vbCrLf & vbCrLf & vbCrLf & vbCrLf & vbCrLf
 
-    ' 7. Create Text Box
+    ' 7. Create Text Box placed at top=0 so Credits starts immediately at slide bottom
     Set donorBox = donorSlide.Shapes.AddTextbox( _
         msoTextOrientationHorizontal, _
         (slideW - boxW) / 2, _
-        slideH, _
+        0, _
         boxW, _
-        100)
+        slideH)
 
     donorBox.Name = "FralinLiveDonorRoll"
     donorBox.TextFrame.WordWrap = msoTrue
@@ -149,18 +147,16 @@ Sub SyncDonorsAndCreateRollingList()
     End With
     On Error GoTo ErrorHandler
 
-    ' 🌟 KEY FIX: AutoSize shape height to match the true physical height of ALL donors!
-    ' Without this, the shape height defaults to 100-500pt and PowerPoint stops animating
-    ' as soon as the small box passes the top, cutting off all overflowing donor names.
+    ' Auto-fit height to all text content
     donorBox.TextFrame.AutoSize = ppAutoSizeShapeToFitText
     donorBox.Width = boxW
     donorBox.Left = (slideW - boxW) / 2
+    donorBox.Top = 0
 
     ' 8. Calculate Dynamic Duration based on TRUE Content Height
-    ' Total travel distance = Slide Height (starting below) + Full Box Height (scrolling past top)
     totalTravelDistance = slideH + donorBox.Height
     dynamicDuration = totalTravelDistance / SCROLL_SPEED_POINTS_PER_SEC
-    If dynamicDuration < 30 Then dynamicDuration = 30
+    If dynamicDuration < 20 Then dynamicDuration = 20
 
     ' 9. Apply Native PowerPoint "Credits" Animation
     For i = donorSlide.TimeLine.MainSequence.Count To 1 Step -1
@@ -176,9 +172,8 @@ Sub SyncDonorsAndCreateRollingList()
     animEffect.Timing.RepeatCount = ANIM_REPEAT_COUNT
 
     MsgBox "Success! Loaded " & (UBound(donorRows, 1)) & " donors onto Slide " & TARGET_SLIDE_INDEX & "." & vbCrLf & vbCrLf & _
-           "• Full Height: " & Round(donorBox.Height) & " pt" & vbCrLf & _
            "• Animation Duration: " & Round(dynamicDuration) & " seconds" & vbCrLf & _
-           "• Scroll Coverage: 100% of all donors will scroll completely off-screen." & vbCrLf & vbCrLf & _
+           "• Starting Position: Immediate entrance from bottom" & vbCrLf & vbCrLf & _
            "Press F5 (or Shift + F5) to start the presentation!", vbInformation, "Donor Roll Updated"
     Exit Sub
 

@@ -10,14 +10,14 @@
 // CONFIGURATION
 // =============================================================================
 const CONFIG = {
-    // 1. Paste your full Google Sheet URL here (any share link, view link, or tab link with #gid=...)
-    // Example: "https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit#gid=0"
-    sheetUrl: "https://myuva-my.sharepoint.com/:x:/g/personal/dbg5af_virginia_edu/IQBDrHqx3UG3QJppnFzTHoMGATxyrU3UWV3-Irso_3Nirt8?e=wVAlnf",
+    // 1. Leave sheetUrl empty to read directly from ./donors.csv (synced every 5 min from SharePoint via GitHub Actions)
+    // Or paste a Google Sheet URL here if using Google Sheets instead.
+    sheetUrl: "",
 
-    // 2. Specific Excel sheet / tab name to read from (e.g., "Donation Screen", "Acks - Edited")
+    // 2. Specific Excel sheet / tab name to read from if using direct workbook parsing
     sheetTabName: "Donation Screen",
 
-    // 3. Local fallback CSV path in case external browser CORS blocks direct download
+    // 3. Local CSV path (synced by GitHub Actions cron job from SharePoint)
     fallbackCsvUrl: "./donors.csv",
 
     // 4. Titles displayed at the top of the scrolling list

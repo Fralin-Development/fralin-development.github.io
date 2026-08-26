@@ -1,4 +1,3 @@
-Attribute VB_Name = "PowerPoint_DonorRoll_Sync"
 ' ==============================================================================
 ' 🏛️ FRALIN MUSEUM OF ART - LIVE DONOR RECOGNITION ROLL FOR POWERPOINT
 ' ==============================================================================
@@ -8,8 +7,9 @@ Attribute VB_Name = "PowerPoint_DonorRoll_Sync"
 '
 ' Usage:
 ' 1. Open PowerPoint and press Alt + F11 (Windows) or Option + F11 (Mac).
-' 2. File > Import File > Select this .bas file (or paste into a new Module).
-' 3. Run the macro "SyncDonorsAndCreateRollingList".
+' 2. Click Insert > Module.
+' 3. Copy and paste this ENTIRE code into the module window.
+' 4. Run the macro "SyncDonorsAndCreateRollingList".
 ' ==============================================================================
 
 Option Explicit
@@ -30,7 +30,7 @@ Public Const TARGET_SLIDE_INDEX As Long = 1
 ' ==============================================================================
 Sub SyncDonorsAndCreateRollingList()
     Dim csvContent As String
-    Dim donorRows As Variant        ' Plain Variant (must NOT be declared as dynamic array donorRows() to avoid Type Mismatch)
+    Dim donorRows As Variant
     Dim donorSlide As Slide
     Dim donorBox As Shape
     Dim animEffect As Effect
@@ -39,7 +39,8 @@ Sub SyncDonorsAndCreateRollingList()
     Dim boxW As Single, boxH As Single
     Dim fullText As String
     Dim dCount As Long
-    
+    Dim dName As String, dAmount As String, dMsg As String
+
     On Error GoTo ErrorHandler
 
     ' 1. Fetch CSV Content from GitHub Pages
@@ -93,7 +94,6 @@ Sub SyncDonorsAndCreateRollingList()
 
     ' Skip row 0 (Header: Name, Amount, Message)
     For i = 1 To UBound(donorRows, 1)
-        Dim dName As String, dAmount As String, dMsg As String
         dName = Trim(CStr(donorRows(i, 0)))
         dAmount = Trim(CStr(donorRows(i, 1)))
         dMsg = Trim(CStr(donorRows(i, 2)))
@@ -206,7 +206,6 @@ Private Function FetchUrlContent(ByVal url As String) As String
     Dim responseText As String
     
     #If Mac Then
-        ' macOS VBA curl execution
         Dim scriptCmd As String
         Dim tmpFile As String
         tmpFile = "/tmp/fralin_donors.csv"
@@ -215,7 +214,6 @@ Private Function FetchUrlContent(ByVal url As String) As String
         responseText = MacScript(scriptCmd)
         On Error GoTo 0
     #Else
-        ' Windows ServerXMLHTTP / XMLHTTP
         On Error Resume Next
         Set http = CreateObject("MSXML2.ServerXMLHTTP.6.0")
         If http Is Nothing Then Set http = CreateObject("MSXML2.ServerXMLHTTP")
@@ -248,6 +246,9 @@ Private Function ParseCsvString(ByVal csvRaw As String) As Variant
     Dim results() As Variant
     Dim rowCount As Long
     Dim cleanText As String
+    Dim lineStr As String
+    Dim tokens As Collection
+    Dim finalResults() As Variant
     
     cleanText = Replace(csvRaw, vbCrLf, vbLf)
     cleanText = Replace(cleanText, vbCr, vbLf)
@@ -258,10 +259,8 @@ Private Function ParseCsvString(ByVal csvRaw As String) As Variant
     rowCount = 0
     
     For i = LBound(lines) To UBound(lines)
-        Dim lineStr As String
         lineStr = Trim(lines(i))
         If Len(lineStr) > 0 Then
-            Dim tokens As Collection
             Set tokens = TokenizeCsvLine(lineStr)
             
             If tokens.Count >= 1 Then
@@ -281,9 +280,7 @@ Private Function ParseCsvString(ByVal csvRaw As String) As Variant
         End If
     Next i
     
-    ' Resize array to actual non-empty row count
     If rowCount > 0 Then
-        Dim finalResults() As Variant
         ReDim finalResults(0 To rowCount - 1, 0 To 2)
         For i = 0 To rowCount - 1
             For j = 0 To 2

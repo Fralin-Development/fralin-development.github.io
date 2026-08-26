@@ -489,6 +489,16 @@ window.addEventListener("resize", () => {
     updateScrollDuration();
 });
 
+// Initialize Office.js when running as a PowerPoint Content Add-in
+if (typeof Office !== "undefined" && Office.onReady) {
+    Office.onReady((info) => {
+        if (info.host === Office.HostType.PowerPoint) {
+            document.body.classList.add("is-embedded", "is-powerpoint");
+            updateScrollDuration();
+        }
+    });
+}
+
 
 
 

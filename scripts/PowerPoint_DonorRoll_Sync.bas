@@ -2,8 +2,8 @@
 ' 🏛️ FRALIN MUSEUM OF ART - LIVE DONOR RECOGNITION ROLL FOR POWERPOINT
 ' ==============================================================================
 ' Description: Fetches live donor data (donors.csv) from GitHub Pages and
-'              generates a native PowerPoint text box with smooth, movie-style
-'              upward rolling "Credits" animation.
+'              generates a native PowerPoint text box with smooth, continuous
+'              upward Motion Path animation across ALL donor records.
 '
 ' Usage:
 ' 1. Open PowerPoint and press Alt + F11 (Windows) or Option + F11 (Mac).
@@ -25,7 +25,7 @@ Public Const ANIM_REPEAT_COUNT As Long = 1000            ' Infinite / continuous
 Public Const TARGET_SLIDE_INDEX As Long = 1
 
 ' ==============================================================================
-' 1. MAIN MACRO: Sync Donors and Generate Continuous Rolling Credits
+' 1. MAIN MACRO: Sync Donors and Generate Full-List Motion Path Scroll
 ' ==============================================================================
 Sub SyncDonorsAndCreateRollingList()
     Dim csvContent As String
@@ -33,6 +33,7 @@ Sub SyncDonorsAndCreateRollingList()
     Dim donorSlide As Slide
     Dim donorBox As Shape
     Dim animEffect As Effect
+    Dim b As AnimationBehavior
     Dim i As Long
     Dim slideW As Single, slideH As Single
     Dim boxW As Single
@@ -43,6 +44,7 @@ Sub SyncDonorsAndCreateRollingList()
     Dim dynamicDuration As Single
     Dim calculatedH As Single
     Dim paraCount As Long
+    Dim relTravel As Single
 
     On Error GoTo ErrorHandler
 
@@ -110,11 +112,11 @@ Sub SyncDonorsAndCreateRollingList()
     ' Trailing empty buffer: clean blank pause after the last donor before seamless loop
     fullText = fullText & vbCrLf & vbCrLf & vbCrLf & vbCrLf & vbCrLf & vbCrLf
 
-    ' 7. Create Text Box
+    ' 7. Create Text Box placed right below the slide bottom (Top = slideH)
     Set donorBox = donorSlide.Shapes.AddTextbox( _
         msoTextOrientationHorizontal, _
         (slideW - boxW) / 2, _
-        0, _
+        slideH, _
         boxW, _
         slideH)
 
@@ -139,7 +141,7 @@ Sub SyncDonorsAndCreateRollingList()
     donorBox.TextFrame.AutoSize = ppAutoSizeShapeToFitText
     DoEvents
 
-    ' Explicitly calculate full text height to prevent early clipping
+    ' Explicitly calculate full text height
     On Error Resume Next
     calculatedH = donorBox.TextFrame.TextRange.BoundHeight
     paraCount = donorBox.TextFrame.TextRange.Paragraphs.Count
@@ -149,30 +151,42 @@ Sub SyncDonorsAndCreateRollingList()
         calculatedH = (paraCount * FONT_SIZE * 1.6) + 150
     End If
 
-    ' Apply full height to text box
+    ' Set full height and starting position below bottom of screen
     donorBox.TextFrame.AutoSize = ppAutoSizeNone
     donorBox.Width = boxW
     donorBox.Height = calculatedH
     donorBox.Left = (slideW - boxW) / 2
-    donorBox.Top = 0
+    donorBox.Top = slideH
 
-    ' 8. Calculate Dynamic Duration based on TRUE Full Content Height
+    ' 8. Calculate Full Travel Distance and Dynamic Duration
     totalTravelDistance = slideH + calculatedH
     dynamicDuration = totalTravelDistance / SCROLL_SPEED_POINTS_PER_SEC
     If dynamicDuration < 5 Then dynamicDuration = 5
 
-    ' 9. Apply Native PowerPoint "Credits" Animation
+    ' 9. Apply Native PowerPoint Upward Motion Path (Bypasses Credits Distance Limits)
     For i = donorSlide.TimeLine.MainSequence.Count To 1 Step -1
         donorSlide.TimeLine.MainSequence(i).Delete
     Next i
 
     Set animEffect = donorSlide.TimeLine.MainSequence.AddEffect( _
         Shape:=donorBox, _
-        EffectId:=msoAnimEffectCredits, _
+        EffectId:=msoAnimEffectPathUp, _
         Trigger:=msoAnimTriggerWithPrevious)
 
     animEffect.Timing.Duration = dynamicDuration
     animEffect.Timing.RepeatCount = ANIM_REPEAT_COUNT
+    animEffect.Timing.SmoothStart = msoFalse
+    animEffect.Timing.SmoothEnd = msoFalse
+
+    ' Set precise path coordinate so 100% of all donors travel completely off top of screen
+    relTravel = totalTravelDistance / slideH
+    On Error Resume Next
+    For Each b In animEffect.Behaviors
+        If b.Type = msoAnimTypeMotion Then
+            b.MotionEffect.Path = "M 0 0 L 0 -" & Replace(Format(relTravel, "0.0000"), ",", ".")
+        End If
+    Next b
+    On Error GoTo ErrorHandler
 
     MsgBox "Success! Loaded " & (UBound(donorRows, 1)) & " donors onto Slide " & TARGET_SLIDE_INDEX & "." & vbCrLf & vbCrLf & _
            "• Full Height: " & Round(calculatedH) & " points" & vbCrLf & _

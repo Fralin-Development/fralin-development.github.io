@@ -20,7 +20,7 @@ Option Explicit
 Public Const CSV_URL As String = "https://fralin-development.github.io/donors.csv"
 Public Const FONT_FAMILY As String = "Poppins"
 Public Const FONT_SIZE As Single = 22
-Public Const SCROLL_SPEED_POINTS_PER_SEC As Single = 60  ' Scroll speed in points/sec (60 = smooth & readable)
+Public Const SCROLL_SPEED_POINTS_PER_SEC As Single = 120  ' Speed: 60 = relaxed, 120 = standard, 200 = brisk
 Public Const ANIM_REPEAT_COUNT As Long = 1000            ' Infinite / continuous looping
 Public Const TARGET_SLIDE_INDEX As Long = 1
 
@@ -41,6 +41,8 @@ Sub SyncDonorsAndCreateRollingList()
     Dim dName As String, dAmount As String, dMsg As String
     Dim totalTravelDistance As Single
     Dim dynamicDuration As Single
+    Dim calculatedH As Single
+    Dim paraCount As Long
 
     On Error GoTo ErrorHandler
 
@@ -84,7 +86,7 @@ Sub SyncDonorsAndCreateRollingList()
     slideH = ActivePresentation.PageSetup.SlideHeight
     boxW = slideW * 0.85
 
-    ' 6. Build Formatted Text Block (Pure donor names, no header banner)
+    ' 6. Build Formatted Text Block (Pure donor names)
     fullText = ""
 
     ' Skip row 0 (Header: Name, Amount, Message)
@@ -105,10 +107,10 @@ Sub SyncDonorsAndCreateRollingList()
         End If
     Next i
 
-    ' Trailing empty buffer: gives a clean 3-second blank pause after the last donor before looping
+    ' Trailing empty buffer: clean blank pause after the last donor before seamless loop
     fullText = fullText & vbCrLf & vbCrLf & vbCrLf & vbCrLf & vbCrLf & vbCrLf
 
-    ' 7. Create Text Box placed at top=0 so Credits starts immediately at slide bottom
+    ' 7. Create Text Box
     Set donorBox = donorSlide.Shapes.AddTextbox( _
         msoTextOrientationHorizontal, _
         (slideW - boxW) / 2, _
@@ -133,16 +135,31 @@ Sub SyncDonorsAndCreateRollingList()
         .ParagraphFormat.Alignment = ppAlignCenter
     End With
 
-    ' Auto-fit height to all text content
+    ' Auto-fit height to calculate exact rendered height
     donorBox.TextFrame.AutoSize = ppAutoSizeShapeToFitText
+    DoEvents
+
+    ' Explicitly calculate full text height to prevent early clipping
+    On Error Resume Next
+    calculatedH = donorBox.TextFrame.TextRange.BoundHeight
+    paraCount = donorBox.TextFrame.TextRange.Paragraphs.Count
+    On Error GoTo ErrorHandler
+
+    If calculatedH < (paraCount * FONT_SIZE * 1.5) Then
+        calculatedH = (paraCount * FONT_SIZE * 1.6) + 150
+    End If
+
+    ' Apply full height to text box
+    donorBox.TextFrame.AutoSize = ppAutoSizeNone
     donorBox.Width = boxW
+    donorBox.Height = calculatedH
     donorBox.Left = (slideW - boxW) / 2
     donorBox.Top = 0
 
-    ' 8. Calculate Dynamic Duration based on TRUE Content Height
-    totalTravelDistance = slideH + donorBox.Height
+    ' 8. Calculate Dynamic Duration based on TRUE Full Content Height
+    totalTravelDistance = slideH + calculatedH
     dynamicDuration = totalTravelDistance / SCROLL_SPEED_POINTS_PER_SEC
-    If dynamicDuration < 20 Then dynamicDuration = 20
+    If dynamicDuration < 5 Then dynamicDuration = 5
 
     ' 9. Apply Native PowerPoint "Credits" Animation
     For i = donorSlide.TimeLine.MainSequence.Count To 1 Step -1
@@ -158,8 +175,8 @@ Sub SyncDonorsAndCreateRollingList()
     animEffect.Timing.RepeatCount = ANIM_REPEAT_COUNT
 
     MsgBox "Success! Loaded " & (UBound(donorRows, 1)) & " donors onto Slide " & TARGET_SLIDE_INDEX & "." & vbCrLf & vbCrLf & _
-           "• Animation Duration: " & Round(dynamicDuration) & " seconds" & vbCrLf & _
-           "• Starting Position: Immediate entrance from bottom" & vbCrLf & vbCrLf & _
+           "• Full Height: " & Round(calculatedH) & " points" & vbCrLf & _
+           "• Animation Duration: " & Round(dynamicDuration, 1) & " seconds" & vbCrLf & vbCrLf & _
            "Press F5 (or Shift + F5) to start the presentation!", vbInformation, "Donor Roll Updated"
     Exit Sub
 

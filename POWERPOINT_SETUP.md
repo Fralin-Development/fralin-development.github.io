@@ -42,7 +42,7 @@ Public Const CSV_URL As String = "https://fralin-development.github.io/donors.cs
 Public Const HEADER_TITLE As String = "THANK YOU TO OUR GENEROUS DONORS"
 Public Const SUBHEADER_TITLE As String = "Who Make Art Together Possible"
 Public Const FONT_FAMILY As String = "Poppins"
-Public Const SCROLL_DURATION_SECONDS As Single = 45#  ' Speed (seconds for 1 full cycle)
-Public Const ANIM_REPEAT_COUNT As Long = 10           ' Number of loops
+Public Const SCROLL_SPEED_POINTS_PER_SEC As Single = 60  ' Scroll speed in points/sec (60 = smooth & readable)
+Public Const ANIM_REPEAT_COUNT As Long = 1000            ' Infinite / continuous looping
 Public Const TARGET_SLIDE_INDEX As Long = 1           ' Slide number to update
 ```

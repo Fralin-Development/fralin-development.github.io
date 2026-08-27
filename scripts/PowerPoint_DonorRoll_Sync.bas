@@ -14,6 +14,14 @@
 
 Option Explicit
 
+#If Mac Then
+    #If VBA7 Then
+        Private Declare PtrSafe Function libc_system Lib "libc.dylib" Alias "system" (ByVal command As String) As Long
+    #Else
+        Private Declare Function libc_system Lib "libc.dylib" Alias "system" (ByVal command As String) As Long
+    #End If
+#End If
+
 ' ------------------------------------------------------------------------------
 ' CONFIGURATION CONSTANTS
 ' ------------------------------------------------------------------------------
@@ -215,18 +223,42 @@ End Sub
 ' 3. HTTP HELPER: Cross-platform HTTP GET (Windows & Mac)
 ' ==============================================================================
 Private Function FetchUrlContent(ByVal url As String) As String
-    Dim http As Object
     Dim responseText As String
+    Dim fNum As Integer
     
     #If Mac Then
-        Dim scriptCmd As String
         Dim tmpFile As String
-        tmpFile = "/tmp/fralin_donors.csv"
-        scriptCmd = "do shell script ""curl -s -L '" & url & "' -o " & tmpFile & " && cat " & tmpFile & """"
+        Dim cmd As String
+        Dim ret As Long
+        
+        tmpFile = "/tmp/fralin_donors_" & Format(Now, "hhnnss") & ".csv"
+        cmd = "curl -s -L """ & url & """ -o """ & tmpFile & """"
+        
+        ' 1. Primary Mac method: POSIX system() via libc.dylib (bypasses AppleScript sandbox)
         On Error Resume Next
-        responseText = MacScript(scriptCmd)
+        ret = libc_system(cmd)
+        
+        If Dir(tmpFile) <> "" Then
+            fNum = FreeFile
+            Open tmpFile For Binary Access Read As #fNum
+            If LOF(fNum) > 0 Then
+                responseText = Space$(LOF(fNum))
+                Get #fNum, , responseText
+            End If
+            Close #fNum
+            Kill tmpFile
+        End If
         On Error GoTo 0
+        
+        ' 2. Fallback Mac method (for older Office 2011/legacy versions)
+        If Len(Trim(responseText)) = 0 Then
+            On Error Resume Next
+            responseText = MacScript("do shell script ""curl -s -L '" & url & "' -o " & tmpFile & " && cat " & tmpFile & """")
+            If Dir(tmpFile) <> "" Then Kill tmpFile
+            On Error GoTo 0
+        End If
     #Else
+        Dim http As Object
         On Error Resume Next
         Set http = CreateObject("MSXML2.ServerXMLHTTP.6.0")
         If http Is Nothing Then Set http = CreateObject("MSXML2.ServerXMLHTTP")
@@ -245,6 +277,30 @@ Private Function FetchUrlContent(ByVal url As String) As String
         End If
         On Error GoTo 0
     #End If
+    
+    ' 3. Local fallback: If download failed, check for a local donors.csv in presentation folder
+    If Len(Trim(responseText)) = 0 Then
+        Dim localPath As String
+        On Error Resume Next
+        localPath = ActivePresentation.Path
+        If Len(localPath) > 0 Then
+            #If Mac Then
+                localPath = localPath & "/donors.csv"
+            #Else
+                localPath = localPath & "\donors.csv"
+            #End If
+            If Dir(localPath) <> "" Then
+                fNum = FreeFile
+                Open localPath For Binary Access Read As #fNum
+                If LOF(fNum) > 0 Then
+                    responseText = Space$(LOF(fNum))
+                    Get #fNum, , responseText
+                End If
+                Close #fNum
+            End If
+        End If
+        On Error GoTo 0
+    End If
     
     FetchUrlContent = responseText
 End Function

@@ -148,7 +148,7 @@ Sub SyncDonorsAndCreateRollingList()
     On Error GoTo ErrorHandler
 
     If calculatedH < (paraCount * FONT_SIZE * 1.5) Then
-        calculatedH = (paraCount * FONT_SIZE * 1.6) + 150
+        calculatedH = (paraCount * FONT_SIZE * 1.6) + 200
     End If
 
     ' Set full height and starting position below bottom of screen
@@ -163,7 +163,7 @@ Sub SyncDonorsAndCreateRollingList()
     dynamicDuration = totalTravelDistance / SCROLL_SPEED_POINTS_PER_SEC
     If dynamicDuration < 5 Then dynamicDuration = 5
 
-    ' 9. Apply Native PowerPoint Upward Motion Path (Bypasses Credits Distance Limits)
+    ' 9. Apply Native PowerPoint Upward Motion Path
     For i = donorSlide.TimeLine.MainSequence.Count To 1 Step -1
         donorSlide.TimeLine.MainSequence(i).Delete
     Next i
@@ -178,18 +178,29 @@ Sub SyncDonorsAndCreateRollingList()
     animEffect.Timing.SmoothStart = msoFalse
     animEffect.Timing.SmoothEnd = msoFalse
 
-    ' Set precise path coordinate so 100% of all donors travel completely off top of screen
+    ' Set travel distance using BOTH Mac ByY/ToY properties and VML Path
     relTravel = totalTravelDistance / slideH
-    On Error Resume Next
+    
     For Each b In animEffect.Behaviors
         If b.Type = msoAnimTypeMotion Then
-            b.MotionEffect.Path = "M 0 0 L 0 -" & Replace(Format(relTravel, "0.0000"), ",", ".")
+            With b.MotionEffect
+                .FromX = 0
+                .FromY = 0
+                .ToX = 0
+                .ToY = -relTravel
+                .ByX = 0
+                .ByY = -relTravel
+                On Error Resume Next
+                .Path = "M 0 0 L 0 -" & Replace(Format(relTravel, "0.0000"), ",", ".")
+                On Error GoTo ErrorHandler
+            End With
         End If
     Next b
-    On Error GoTo ErrorHandler
 
     MsgBox "Success! Loaded " & (UBound(donorRows, 1)) & " donors onto Slide " & TARGET_SLIDE_INDEX & "." & vbCrLf & vbCrLf & _
+           "• Total Donors: " & UBound(donorRows, 1) & vbCrLf & _
            "• Full Height: " & Round(calculatedH) & " points" & vbCrLf & _
+           "• Travel Multiplier: " & Round(relTravel, 1) & "x slide height" & vbCrLf & _
            "• Animation Duration: " & Round(dynamicDuration, 1) & " seconds" & vbCrLf & vbCrLf & _
            "Press F5 (or Shift + F5) to start the presentation!", vbInformation, "Donor Roll Updated"
     Exit Sub

@@ -45,10 +45,12 @@ Sub SyncDonorsAndCreateRollingList()
 
     On Error GoTo ErrorHandler
 
-    ' 1. Fetch CSV Content (Live Web -> Local CSV File -> Embedded Data Fallback)
+    ' 1. Fetch CSV Content from Live URL (cache-busted with timestamp)
     csvContent = FetchUrlContent(CSV_URL & "?t=" & Format(Now, "yyyymmddhhnnss"))
     If Len(Trim(csvContent)) = 0 Then
-        csvContent = GetEmbeddedDonorCsv()
+        MsgBox "Failed to download donor data from:" & vbCrLf & CSV_URL & vbCrLf & vbCrLf & _
+               "Please check your internet connection.", vbCritical, "Donor Sync Error"
+        Exit Sub
     End If
 
     ' 2. Parse CSV into 2D Array
@@ -214,12 +216,11 @@ End Sub
 ' ==============================================================================
 Private Function FetchUrlContent(ByVal url As String) As String
     Dim responseText As String
-    Dim fNum As Integer
     
     #If Mac Then
         ' Mac OS: Execute curl via AppleScript with SSL certificate bypass (-k)
         On Error Resume Next
-        responseText = MacScript("do shell script ""curl -s -k -L 'https://fralin-development.github.io/donors.csv'""")
+        responseText = MacScript("do shell script ""curl -s -k -L '" & url & "'""")
         On Error GoTo 0
     #Else
         Dim http As Object
@@ -241,30 +242,6 @@ Private Function FetchUrlContent(ByVal url As String) As String
         End If
         On Error GoTo 0
     #End If
-    
-    ' Local fallback: Check if a local donors.csv exists in the presentation folder
-    If Len(Trim(responseText)) = 0 Then
-        Dim localPath As String
-        On Error Resume Next
-        localPath = ActivePresentation.Path
-        If Len(localPath) > 0 Then
-            #If Mac Then
-                localPath = localPath & "/donors.csv"
-            #Else
-                localPath = localPath & "\donors.csv"
-            #End If
-            If Dir(localPath) <> "" Then
-                fNum = FreeFile
-                Open localPath For Binary Access Read As #fNum
-                If LOF(fNum) > 0 Then
-                    responseText = Space$(LOF(fNum))
-                    Get #fNum, , responseText
-                End If
-                Close #fNum
-            End If
-        End If
-        On Error GoTo 0
-    End If
     
     FetchUrlContent = responseText
 End Function
@@ -357,50 +334,4 @@ Private Function TokenizeCsvLine(ByVal line As String) As Collection
     
     col.Add Trim(curToken)
     Set TokenizeCsvLine = col
-End Function
-
-' ==============================================================================
-' 5. EMBEDDED BACKUP DONOR DATA
-' ==============================================================================
-Private Function GetEmbeddedDonorCsv() As String
-    Dim s As String
-    s = "Donor Name" & vbCrLf
-    s = s & """Christine and Ross Kreamer""" & vbCrLf
-    s = s & """Kristin and Daniel Weiss""" & vbCrLf
-    s = s & """Judith Stiefel and Michael Checknoff""" & vbCrLf
-    s = s & """Mollie Danforth and Steve Colangelo""" & vbCrLf
-    s = s & """Karen Judd""" & vbCrLf
-    s = s & """Barbara Kirkland""" & vbCrLf
-    s = s & """Marcy and Brad Daniel""" & vbCrLf
-    s = s & """Gabrielle Barr""" & vbCrLf
-    s = s & """Christine and Joseph Melnik""" & vbCrLf
-    s = s & """Allison and Andreas VanDenend""" & vbCrLf
-    s = s & """Nargis Cross""" & vbCrLf
-    s = s & """Joan Jay""" & vbCrLf
-    s = s & """Anne and Gary Westmoreland""" & vbCrLf
-    s = s & """Kimberly Dunsmore and Daniel Chernavvsky""" & vbCrLf
-    s = s & """Jarrett and Stephen Millard""" & vbCrLf
-    s = s & """Georgia and David Clapham""" & vbCrLf
-    s = s & """Ann Huebner and Ross Waller""" & vbCrLf
-    s = s & """Jackie Brownfield""" & vbCrLf
-    s = s & """Catriona Erler""" & vbCrLf
-    s = s & """Cecily and Stephen Winchell""" & vbCrLf
-    s = s & """Rosemarie Koch""" & vbCrLf
-    s = s & """Chris Pikrallidas""" & vbCrLf
-    s = s & """James Wheeler""" & vbCrLf
-    s = s & """Ted Haile""" & vbCrLf
-    s = s & """Cindy and Joe Walden""" & vbCrLf
-    s = s & """James and Betsy Greene""" & vbCrLf
-    s = s & """Susan Thomas""" & vbCrLf
-    s = s & """Victoria Norwood""" & vbCrLf
-    s = s & """Phyllis Koch-Sheras and Peter Sheras""" & vbCrLf
-    s = s & """Jacqueline Langholtz and William Taylor""" & vbCrLf
-    s = s & """Bill Sihler""" & vbCrLf
-    s = s & """Allison Linney""" & vbCrLf
-    s = s & """Faye and Hal Warner""" & vbCrLf
-    s = s & """Maria and Bob Chapel""" & vbCrLf
-    s = s & """Cheryl and Robert Byron""" & vbCrLf
-    s = s & """Blair Ege""" & vbCrLf
-    s = s & """Bob Emmett and Kris Kasselman""" & vbCrLf
-    GetEmbeddedDonorCsv = s
 End Function

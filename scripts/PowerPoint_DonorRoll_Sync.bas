@@ -4,6 +4,7 @@
 ' Description: Fetches live donor data (donors.csv) from GitHub Pages and
 '              generates a native PowerPoint text box with smooth, continuous
 '              upward Motion Path animation across ALL donor records.
+'              Supports live mid-presentation auto-updates!
 '
 ' Usage:
 ' 1. Open PowerPoint and press Alt + F11 (Windows) or Option + F11 (Mac).
@@ -25,9 +26,47 @@ Public Const ANIM_REPEAT_COUNT As Long = 1000            ' Infinite / continuous
 Public Const TARGET_SLIDE_INDEX As Long = 1
 
 ' ==============================================================================
-' 1. MAIN MACRO: Sync Donors and Generate Full-List Motion Path Scroll
+' 1. MAIN MACROS: Manual & Mid-Presentation Silent Auto-Sync
 ' ==============================================================================
+
+' Manual sync (shows confirmation popup)
 Sub SyncDonorsAndCreateRollingList()
+    ExecuteDonorSync True
+End Sub
+
+' Silent sync for live presentation (no popup interruption)
+Sub SyncDonorsSilently()
+    ExecuteDonorSync False
+End Sub
+
+' Gala Dark Mode
+Sub SyncDonorsDarkMode()
+    ExecuteDonorSync True
+    ApplyDarkModeStyling
+End Sub
+
+' ==============================================================================
+' 2. MID-PRESENTATION AUTO-UPDATE HOOKS
+' ==============================================================================
+
+' Auto-syncs live donors the instant the presentation begins (F5)
+Sub OnSlideShowBegin(ByVal Wn As SlideShowWindow)
+    On Error Resume Next
+    ExecuteDonorSync False
+End Sub
+
+' Auto-syncs live donors every time the presentation loops back to Slide 1
+Sub OnSlideShowPageChange(ByVal Wn As SlideShowWindow)
+    On Error Resume Next
+    If Wn.View.Slide.SlideIndex = TARGET_SLIDE_INDEX Then
+        ExecuteDonorSync False
+    End If
+End Sub
+
+' ==============================================================================
+' 3. CORE SYNC ENGINE
+' ==============================================================================
+Private Sub ExecuteDonorSync(ByVal showPopups As Boolean)
     Dim csvContent As String
     Dim donorRows As Variant
     Dim donorSlide As Slide
@@ -51,29 +90,21 @@ Sub SyncDonorsAndCreateRollingList()
     ' 1. Fetch CSV Content from Live URL or Local File
     csvContent = FetchUrlContent(CSV_URL & "?t=" & Format(Now, "yyyymmddhhnnss"))
     If Len(Trim(csvContent)) = 0 Then
-        MsgBox "No donor data could be loaded. Please ensure you have an internet connection or select a donors.csv file.", vbCritical, "Donor Sync Error"
+        If showPopups Then
+            MsgBox "No donor data could be loaded. Please check your internet connection.", vbCritical, "Donor Sync Error"
+        End If
         Exit Sub
     End If
 
     ' 2. Parse CSV into 2D Array
     donorRows = ParseCsvString(csvContent)
-    
-    If Not IsArray(donorRows) Then
-        MsgBox "Failed to parse donor CSV.", vbCritical, "Parser Error"
-        Exit Sub
-    End If
+    If Not IsArray(donorRows) Then Exit Sub
     
     dCount = UBound(donorRows, 1) - LBound(donorRows, 1) + 1
-    If dCount <= 1 Then
-        MsgBox "The donor file contains no donor records.", vbExclamation, "No Donors Found"
-        Exit Sub
-    End If
+    If dCount <= 1 Then Exit Sub
 
     ' 3. Validate Slide Selection
-    If TARGET_SLIDE_INDEX > ActivePresentation.Slides.Count Or TARGET_SLIDE_INDEX < 1 Then
-        MsgBox "Slide " & TARGET_SLIDE_INDEX & " does not exist in the active presentation.", vbCritical, "Slide Error"
-        Exit Sub
-    End If
+    If TARGET_SLIDE_INDEX > ActivePresentation.Slides.Count Or TARGET_SLIDE_INDEX < 1 Then Exit Sub
     Set donorSlide = ActivePresentation.Slides(TARGET_SLIDE_INDEX)
 
     ' 4. Clean up any previous donor boxes on this slide
@@ -197,25 +228,24 @@ Sub SyncDonorsAndCreateRollingList()
         End If
     Next b
 
-    MsgBox "Success! Loaded " & (UBound(donorRows, 1)) & " donors onto Slide " & TARGET_SLIDE_INDEX & "." & vbCrLf & vbCrLf & _
-           "• Total Donors: " & UBound(donorRows, 1) & vbCrLf & _
-           "• Full Height: " & Round(calculatedH) & " points" & vbCrLf & _
-           "• Travel Multiplier: " & Round(relTravel, 1) & "x slide height" & vbCrLf & _
-           "• Animation Duration: " & Round(dynamicDuration, 1) & " seconds" & vbCrLf & vbCrLf & _
-           "Press F5 (or Shift + F5) to start the presentation!", vbInformation, "Donor Roll Updated"
+    If showPopups Then
+        MsgBox "Success! Loaded " & (UBound(donorRows, 1)) & " donors onto Slide " & TARGET_SLIDE_INDEX & "." & vbCrLf & vbCrLf & _
+               "• Total Donors: " & UBound(donorRows, 1) & vbCrLf & _
+               "• Full Height: " & Round(calculatedH) & " points" & vbCrLf & _
+               "• Travel Multiplier: " & Round(relTravel, 1) & "x slide height" & vbCrLf & _
+               "• Animation Duration: " & Round(dynamicDuration, 1) & " seconds" & vbCrLf & vbCrLf & _
+               "Press F5 (or Shift + F5) to start the presentation!", vbInformation, "Donor Roll Updated"
+    End If
     Exit Sub
 
 ErrorHandler:
-    MsgBox "An error occurred during sync:" & vbCrLf & _
-           "Error " & Err.Number & ": " & Err.Description, vbCritical, "VBA Sync Error"
+    If showPopups Then
+        MsgBox "An error occurred during sync:" & vbCrLf & _
+               "Error " & Err.Number & ": " & Err.Description, vbCritical, "VBA Sync Error"
+    End If
 End Sub
 
-' ==============================================================================
-' 2. DARK THEME GALA VARIANT
-' ==============================================================================
-Sub SyncDonorsDarkMode()
-    SyncDonorsAndCreateRollingList
-    
+Private Sub ApplyDarkModeStyling()
     Dim donorSlide As Slide
     Dim donorBox As Shape
     Dim i As Long
@@ -240,7 +270,7 @@ Sub SyncDonorsDarkMode()
 End Sub
 
 ' ==============================================================================
-' 3. HTTP & FILE HELPER: Robust Cross-Platform Loading
+' 4. HTTP & FILE HELPER: Robust Cross-Platform Loading
 ' ==============================================================================
 Private Function FetchUrlContent(ByVal url As String) As String
     Dim responseText As String
@@ -328,7 +358,7 @@ Private Function ReadLocalFileText(ByVal filePath As String) As String
 End Function
 
 ' ==============================================================================
-' 4. CSV PARSER
+' 5. CSV PARSER
 ' ==============================================================================
 Private Function ParseCsvString(ByVal csvRaw As String) As Variant
     Dim lines() As String

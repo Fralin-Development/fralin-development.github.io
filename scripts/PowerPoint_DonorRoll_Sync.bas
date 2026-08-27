@@ -45,11 +45,10 @@ Sub SyncDonorsAndCreateRollingList()
 
     On Error GoTo ErrorHandler
 
-    ' 1. Fetch CSV Content from Live URL (cache-busted with timestamp)
+    ' 1. Fetch CSV Content from Live URL or Local File
     csvContent = FetchUrlContent(CSV_URL & "?t=" & Format(Now, "yyyymmddhhnnss"))
     If Len(Trim(csvContent)) = 0 Then
-        MsgBox "Failed to download donor data from:" & vbCrLf & CSV_URL & vbCrLf & vbCrLf & _
-               "Please check your internet connection.", vbCritical, "Donor Sync Error"
+        MsgBox "No donor data could be loaded. Please ensure you have an internet connection or select a donors.csv file.", vbCritical, "Donor Sync Error"
         Exit Sub
     End If
 
@@ -63,7 +62,7 @@ Sub SyncDonorsAndCreateRollingList()
     
     dCount = UBound(donorRows, 1) - LBound(donorRows, 1) + 1
     If dCount <= 1 Then
-        MsgBox "The downloaded donor file contains no donor records.", vbExclamation, "No Donors Found"
+        MsgBox "The donor file contains no donor records.", vbExclamation, "No Donors Found"
         Exit Sub
     End If
 
@@ -212,17 +211,48 @@ Sub SyncDonorsDarkMode()
 End Sub
 
 ' ==============================================================================
-' 3. HTTP HELPER: Cross-platform HTTP GET (Windows & Mac)
+' 3. HTTP & FILE HELPER: Robust Cross-Platform Loading
 ' ==============================================================================
 Private Function FetchUrlContent(ByVal url As String) As String
     Dim responseText As String
     
     #If Mac Then
-        ' Mac OS: Execute curl via AppleScript with SSL certificate bypass (-k)
+        ' 1. Attempt Mac download via AppleScript
         On Error Resume Next
-        responseText = MacScript("do shell script ""curl -s -k -L '" & url & "'""")
+        responseText = MacScript("do shell script ""curl -s -k -L 'https://fralin-development.github.io/donors.csv'""")
         On Error GoTo 0
+        
+        ' 2. If blocked by macOS sandbox, auto-check local paths
+        If Len(Trim(responseText)) = 0 Then
+            ' Check same folder as presentation
+            If Len(ActivePresentation.Path) > 0 Then
+                responseText = ReadLocalFileText(ActivePresentation.Path & "/donors.csv")
+            End If
+            
+            ' Check Downloads folder
+            If Len(Trim(responseText)) = 0 Then
+                Dim dlFolder As String
+                On Error Resume Next
+                dlFolder = MacScript("POSIX path of (path to downloads folder)")
+                On Error GoTo 0
+                If Len(dlFolder) > 0 Then
+                    responseText = ReadLocalFileText(dlFolder & "donors.csv")
+                End If
+            End If
+            
+            ' 3. If still not found, prompt user with native Mac file picker
+            If Len(Trim(responseText)) = 0 Then
+                Dim chosenPath As String
+                On Error Resume Next
+                chosenPath = MacScript("try" & vbCr & "return POSIX path of (choose file with prompt ""Select donors.csv file:"")" & vbCr & "on error" & vbCr & "return """"" & vbCr & "end try")
+                On Error GoTo 0
+                If Len(chosenPath) > 0 Then
+                    responseText = ReadLocalFileText(chosenPath)
+                End If
+            End If
+        End If
     #Else
+        ' Windows: Standard XMLHTTP request
         Dim http As Object
         On Error Resume Next
         Set http = CreateObject("MSXML2.ServerXMLHTTP.6.0")
@@ -241,9 +271,31 @@ Private Function FetchUrlContent(ByVal url As String) As String
             End If
         End If
         On Error GoTo 0
+        
+        ' Windows Local Fallback
+        If Len(Trim(responseText)) = 0 And Len(ActivePresentation.Path) > 0 Then
+            responseText = ReadLocalFileText(ActivePresentation.Path & "\donors.csv")
+        End If
     #End If
     
     FetchUrlContent = responseText
+End Function
+
+Private Function ReadLocalFileText(ByVal filePath As String) As String
+    Dim fNum As Integer
+    Dim fileText As String
+    On Error Resume Next
+    If Len(filePath) > 0 And Dir(filePath) <> "" Then
+        fNum = FreeFile
+        Open filePath For Binary Access Read As #fNum
+        If LOF(fNum) > 0 Then
+            fileText = Space$(LOF(fNum))
+            Get #fNum, , fileText
+        End If
+        Close #fNum
+    End If
+    On Error GoTo 0
+    ReadLocalFileText = fileText
 End Function
 
 ' ==============================================================================

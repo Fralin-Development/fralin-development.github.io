@@ -4,13 +4,13 @@
 ' Description: Fetches live donor data (donors.csv) from GitHub Pages and
 '              generates a native PowerPoint text box with smooth, continuous
 '              upward Motion Path animation across ALL donor records.
-'              Supports live mid-presentation auto-updates!
+'              Supports live mid-presentation auto-updates & background layering!
 '
 ' Usage:
 ' 1. Open PowerPoint and press Alt + F11 (Windows) or Option + F11 (Mac).
 ' 2. Click Insert > Module.
 ' 3. Copy and paste this ENTIRE code into the module window.
-' 4. Run the macro "SyncDonorsAndCreateRollingList".
+' 4. Save your presentation as PowerPoint Macro-Enabled Presentation (.pptm).
 ' ==============================================================================
 
 Option Explicit
@@ -189,12 +189,20 @@ Private Sub ExecuteDonorSync(ByVal showPopups As Boolean)
     donorBox.Left = (slideW - boxW) / 2
     donorBox.Top = slideH
 
-    ' 8. Calculate Full Travel Distance and Dynamic Duration
+    ' 8. Z-Order: Send donor box to back so it sneaks under any pictures or logos
+    donorBox.ZOrder msoSendToBack
+    For i = 1 To donorSlide.Shapes.Count
+        If donorSlide.Shapes(i).Name <> "FralinLiveDonorRoll" Then
+            donorSlide.Shapes(i).ZOrder msoBringToFront
+        End If
+    Next i
+
+    ' 9. Calculate Full Travel Distance and Dynamic Duration
     totalTravelDistance = slideH + calculatedH
     dynamicDuration = totalTravelDistance / SCROLL_SPEED_POINTS_PER_SEC
     If dynamicDuration < 5 Then dynamicDuration = 5
 
-    ' 9. Apply Native PowerPoint Upward Motion Path
+    ' 10. Apply Native PowerPoint Upward Motion Path
     For i = donorSlide.TimeLine.MainSequence.Count To 1 Step -1
         donorSlide.TimeLine.MainSequence(i).Delete
     Next i
@@ -232,7 +240,7 @@ Private Sub ExecuteDonorSync(ByVal showPopups As Boolean)
         MsgBox "Success! Loaded " & (UBound(donorRows, 1)) & " donors onto Slide " & TARGET_SLIDE_INDEX & "." & vbCrLf & vbCrLf & _
                "• Total Donors: " & UBound(donorRows, 1) & vbCrLf & _
                "• Full Height: " & Round(calculatedH) & " points" & vbCrLf & _
-               "• Travel Multiplier: " & Round(relTravel, 1) & "x slide height" & vbCrLf & _
+               "• Layering: Set behind pictures / foreground elements" & vbCrLf & _
                "• Animation Duration: " & Round(dynamicDuration, 1) & " seconds" & vbCrLf & vbCrLf & _
                "Press F5 (or Shift + F5) to start the presentation!", vbInformation, "Donor Roll Updated"
     End If

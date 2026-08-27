@@ -18,9 +18,8 @@ Option Explicit
 ' CONFIGURATION CONSTANTS
 ' ------------------------------------------------------------------------------
 Public Const CSV_URL As String = "https://fralin-development.github.io/donors.csv"
-Public Const HEADER_TITLE As String = "THANK YOU TO OUR GENEROUS DONORS"
-Public Const SUBHEADER_TITLE As String = "Who Make Art Together Possible"
 Public Const FONT_FAMILY As String = "Poppins"
+Public Const FONT_SIZE As Single = 22
 Public Const SCROLL_SPEED_POINTS_PER_SEC As Single = 60  ' Scroll speed in points/sec (60 = smooth & readable)
 Public Const ANIM_REPEAT_COUNT As Long = 1000            ' Infinite / continuous looping
 Public Const TARGET_SLIDE_INDEX As Long = 1
@@ -85,12 +84,8 @@ Sub SyncDonorsAndCreateRollingList()
     slideH = ActivePresentation.PageSetup.SlideHeight
     boxW = slideW * 0.85
 
-    ' 6. Build Formatted Text Block
-    fullText = HEADER_TITLE & vbCrLf
-    If Len(Trim(SUBHEADER_TITLE)) > 0 Then
-        fullText = fullText & SUBHEADER_TITLE & vbCrLf
-    End If
-    fullText = fullText & String(30, "-") & vbCrLf & vbCrLf
+    ' 6. Build Formatted Text Block (Pure donor names, no header banner)
+    fullText = ""
 
     ' Skip row 0 (Header: Name, Amount, Message)
     For i = 1 To UBound(donorRows, 1)
@@ -110,7 +105,7 @@ Sub SyncDonorsAndCreateRollingList()
         End If
     Next i
 
-    ' Trailing empty buffer: gives a clean 3-second blank pause after the last donor
+    ' Trailing empty buffer: gives a clean 3-second blank pause after the last donor before looping
     fullText = fullText & vbCrLf & vbCrLf & vbCrLf & vbCrLf & vbCrLf & vbCrLf
 
     ' 7. Create Text Box placed at top=0 so Credits starts immediately at slide bottom
@@ -132,19 +127,11 @@ Sub SyncDonorsAndCreateRollingList()
     ' Typography & Fralin Blue (#127CC2)
     With donorBox.TextFrame.TextRange
         .Font.Name = FONT_FAMILY
-        .Font.Size = 22
+        .Font.Size = FONT_SIZE
         .Font.Bold = msoFalse
         .Font.Color.RGB = RGB(18, 124, 194)
         .ParagraphFormat.Alignment = ppAlignCenter
     End With
-
-    ' Large bold title
-    On Error Resume Next
-    With donorBox.TextFrame.TextRange.Paragraphs(1)
-        .Font.Bold = msoTrue
-        .Font.Size = 28
-    End With
-    On Error GoTo ErrorHandler
 
     ' Auto-fit height to all text content
     donorBox.TextFrame.AutoSize = ppAutoSizeShapeToFitText
@@ -205,8 +192,8 @@ Sub SyncDonorsDarkMode()
         donorSlide.Background.Fill.Solid
         donorSlide.Background.Fill.ForeColor.RGB = RGB(7, 10, 18)
         
-        donorBox.TextFrame.TextRange.Font.Color.RGB = RGB(255, 255, 255)
-        donorBox.TextFrame.TextRange.Paragraphs(1).Font.Color.RGB = RGB(229, 193, 88)
+        ' Crisp gold donor names on dark background
+        donorBox.TextFrame.TextRange.Font.Color.RGB = RGB(229, 193, 88)
     End If
 End Sub
 
